@@ -22,10 +22,9 @@ class DatabaseConfigurator {
   }
 
   private def setupConnection(name:String, conf:util.HashMap[String,String]) = {
-
     System.out.println(s"named = $name, conf=${conf.get("url")}")
 
-    AsyncConnectionPool.add(name, conf.get("url"), conf.get("username"), conf.get("password"))
+    AsyncConnectionPool.add(Symbol(name), conf.get("url"), conf.get("username"), conf.get("password"))
   }
 
   private def setupDefault(conf:Config) = {

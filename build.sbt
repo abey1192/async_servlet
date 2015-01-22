@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "com.typesafe"        %  "config"            % "1.2.1",
   "org.scalikejdbc"     %% "scalikejdbc-async" % "0.5.+",
   "com.github.mauricio" %% "mysql-async"       % "0.2.+",
-  "com.bionicspirit"    %% "shade"             % "1.6.+"
+  "com.bionicspirit"    %% "shade"             % "1.6.+",
+  "org.json4s"          %% "json4s-jackson"    % "3.2.11"
 )
 
