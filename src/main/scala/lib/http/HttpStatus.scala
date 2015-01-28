@@ -1,8 +1,11 @@
 package lib.http
 
 
-sealed class HttpStatus(var code:Int) {
+sealed class HttpStatus(code:Int) {
   def isError:Boolean = code >= 500
+
+  def toInt:Int = code
+
 }
 
 object HttpStatus {

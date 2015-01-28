@@ -9,7 +9,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scalikejdbc._, async._
 
 class Index(ctx:AsyncContext) extends BaseAction(ctx) {
-  import org.json4s._, jackson.JsonMethods._
 
   protected def action() = {
 
@@ -23,8 +22,7 @@ class Index(ctx:AsyncContext) extends BaseAction(ctx) {
 
       val str = idOpt.map { id => s"last user id is $id"}.getOrElse("no user")
 
-      Result(compact(render(JObject(JField("result", JString(str))))), contentType = ContentType.Json)
-
+      Result(formatter.format(Map("lastId" -> str)), contentType = formatter.contentType)
     }
   }
 }
