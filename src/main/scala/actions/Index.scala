@@ -1,12 +1,13 @@
-package asyncserv
+package actions
 
 import javax.servlet.AsyncContext
-import lib.http.{ContentType, Result, BaseAction}
+
 import lib.cache.Cache
+import lib.http.{BaseAction, Result}
+import scalikejdbc._
+import scalikejdbc.async._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
-import scalikejdbc._, async._
 
 class Index(ctx:AsyncContext) extends BaseAction(ctx) {
 

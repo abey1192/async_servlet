@@ -4,7 +4,7 @@ import javax.servlet.AsyncContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import lib.exception.AsyncServletException
-import lib.http.formatter.ResponseFormatterRepository
+import lib.http.formatter.ResponseFormatterTrait
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -12,45 +12,28 @@ import scala.util.{Failure, Success}
 
 
 
-abstract class BaseAction(ctx:AsyncContext) extends Runnable {
+abstract class BaseAction(ctx:AsyncContext) extends Runnable with ResponseFormatterTrait {
 
-  private[this] val request:HttpServletRequest = ctx.getRequest.asInstanceOf[HttpServletRequest]
-  private[this] val response:HttpServletResponse = ctx.getResponse.asInstanceOf[HttpServletResponse]
-
-  protected val formatter = ResponseFormatterRepository.formatter(request)
+  protected val request:HttpServletRequest = ctx.getRequest.asInstanceOf[HttpServletRequest]
+  protected val response:HttpServletResponse = ctx.getResponse.asInstanceOf[HttpServletResponse]
 
   def run() = {
-    val result = invoke()
+    try {
+      val result = invoke()
 
-    result.map { r =>
-      response.setStatus(r.status.toInt)
-      response.setContentType(r.contentType.toString)
-      response.setContentLength(r.contentBody.length)
-      response.getOutputStream.write(r.contentBody)
-
-    }.andThen {
-      case Success(_) => ctx.complete()
-      case Failure(e) => errorResponse(e)
+      result.map(_.write(response)).andThen {
+        case Success(_) => ctx.complete()
+        case Failure(e) => errorResponse(e)
+      }
+    }
+    catch {
+      case e:AsyncServletException => errorResponse(e)
+      case e:Throwable => throw e
+      case _ =>
     }
   }
 
-  private def errorResponse(exception:Throwable) = exception match {
-    case ex: AsyncServletException => setResponseWithException(ex)
-    case _ => throw exception
-  }
-
-  private def setResponseWithException(ex:AsyncServletException) = {
-    val result = formatter.exception(ex)
-
-    response.setStatus(ex.status.toInt)
-    response.setContentType(formatter.contentType.toString)
-    response.setContentLength(result.length)
-    response.getOutputStream.write(result)
-
-    ctx.complete()
-  }
-
-  private def invoke():Future[Result] = {
+  private def invoke() = {
     request.getMethod match {
       case "GET"  => action()
       case "POST" => action()
@@ -58,6 +41,15 @@ abstract class BaseAction(ctx:AsyncContext) extends Runnable {
     }
   }
 
+  private def errorResponse(exception:Throwable) = exception match {
+    case ex:AsyncServletException => setResponseWithException(ex)
+    case _                        => throw exception
+  }
+
+  private def setResponseWithException(ex:AsyncServletException) = {
+    Result(formatter.exception(ex), status = ex.status, contentType = formatter.contentType).write(response)
+    ctx.complete()
+  }
 
   protected def action():Future[Result]
 

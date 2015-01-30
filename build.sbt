@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc"     %% "scalikejdbc-async" % "0.5.+",
   "com.github.mauricio" %% "mysql-async"       % "0.2.+",
   "com.bionicspirit"    %% "shade"             % "1.6.+",
+  "commons-codec"       %  "commons-codec"     % "1.4",
   "org.json4s"          %% "json4s-jackson"    % "3.2.11",
   "org.msgpack"         %% "msgpack-scala"     % "0.6.11"
 )

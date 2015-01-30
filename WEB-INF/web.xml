@@ -9,7 +9,7 @@
 
     <servlet>
         <servlet-name>AsyncServlet</servlet-name>
-        <servlet-class>asyncserv.Entry</servlet-class>
+        <servlet-class>asyncserv.ServletEntry</servlet-class>
         <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
